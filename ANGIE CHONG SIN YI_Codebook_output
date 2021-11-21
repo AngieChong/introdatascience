@@ -1,0 +1,122 @@
+> library(haven)
+> data <- read_sav("https://mmi.psycho.unibas.ch/r-toolbox/data/Cars.sav")
+> 
+> library(sjlabelled)
+
+Attaching package: ‘sjlabelled’
+
+The following objects are masked from ‘package:haven’:
+
+    as_factor, read_sas, read_spss, read_stata, write_sas, zap_labels
+
+> get_label(data)
+                                        MPG 
+                         "Miles per Gallon" 
+                                     ENGINE 
+         "Engine Displacement (cu. inches)" 
+                                      HORSE 
+                               "Horsepower" 
+                                     WEIGHT 
+                    "Vehicle Weight (lbs.)" 
+                                      ACCEL 
+"Time to Accelerate from 0 to 60 mph (sec)" 
+                                       YEAR 
+                  "Model Year (modulo 100)" 
+                                     ORIGIN 
+                        "Country of Origin" 
+                                   CYLINDER 
+                      "Number of Cylinders" 
+                                   FILTER_$ 
+         "cylrec = 1 | cylrec = 2 (FILTER)" 
+> get_labels(data)
+$MPG
+NULL
+
+$ENGINE
+NULL
+
+$HORSE
+NULL
+
+$WEIGHT
+NULL
+
+$ACCEL
+NULL
+
+$YEAR
+ [1] "0 (Missing)" "70"          "71"          "72"          "73"         
+ [6] "74"          "75"          "76"          "77"          "78"         
+[11] "79"          "80"          "81"          "82"         
+
+$ORIGIN
+[1] "American" "European" "Japanese"
+
+$CYLINDER
+[1] "3 Cylinders" "4 Cylinders" "5 Cylinders" "6 Cylinders" "8 Cylinders"
+
+$`FILTER_$`
+[1] "Not Selected" "Selected"    
+
+> 
+> 
+> library(tibble)
+> simple_codebook <- enframe(get_label(data))
+> colnames(simple_codebook) <- c("variable_id", "item_text")
+> simple_codebook
+# A tibble: 9 x 2
+  variable_id item_text                                
+  <chr>       <chr>                                    
+1 MPG         Miles per Gallon                         
+2 ENGINE      Engine Displacement (cu. inches)         
+3 HORSE       Horsepower                               
+4 WEIGHT      Vehicle Weight (lbs.)                    
+5 ACCEL       Time to Accelerate from 0 to 60 mph (sec)
+6 YEAR        Model Year (modulo 100)                  
+7 ORIGIN      Country of Origin                        
+8 CYLINDER    Number of Cylinders                      
+9 FILTER_$    cylrec = 1 | cylrec = 2 (FILTER)         
+> 
+> library(psych)
+> library(dplyr)
+
+Attaching package: ‘dplyr’
+
+The following object is masked from ‘package:sjlabelled’:
+
+    as_label
+
+The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+> 
+> descriptives <- data %>% describe() %>% as_tibble() %>% select("n","min","max","mean")
+> simple_codebook <- cbind(simple_codebook,descriptives)
+> simple_codebook
+  variable_id                                 item_text   n min    max
+1         MPG                          Miles per Gallon 398   9   46.6
+2      ENGINE          Engine Displacement (cu. inches) 406   4  455.0
+3       HORSE                                Horsepower 400  46  230.0
+4      WEIGHT                     Vehicle Weight (lbs.) 406 732 5140.0
+5       ACCEL Time to Accelerate from 0 to 60 mph (sec) 406   8   24.8
+6        YEAR                   Model Year (modulo 100) 405  70   82.0
+7      ORIGIN                         Country of Origin 405   1    3.0
+8    CYLINDER                       Number of Cylinders 405   3    8.0
+9    FILTER_$          cylrec = 1 | cylrec = 2 (FILTER) 398   0    1.0
+          mean
+1   23.5145729
+2  194.0406404
+3  104.8325000
+4 2969.5615764
+5   15.4950739
+6   75.9358025
+7    1.5703704
+8    5.4691358
+9    0.7311558
+> 
+> 
